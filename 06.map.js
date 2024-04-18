@@ -5,7 +5,7 @@ import { map, of, fromEvent, mapTo } from "rxjs";
 //   .subscribe(console.log);
 
 const keyup$ = fromEvent(document, "keyup").pipe(map((event) => event.code));
-const pressed$ = keyup$.pipe(map((value) => "key pressed"));
+const pressed$ = keyup$.pipe(map(() => "key pressed"));
 
 keyup$.subscribe(console.log);
 pressed$.subscribe(console.log);
