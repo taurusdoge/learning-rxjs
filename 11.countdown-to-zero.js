@@ -1,4 +1,4 @@
-import { interval, map, scan, filter } from "rxjs";
+import { interval, map, scan, filter, tap } from "rxjs";
 
 // elem refs
 const countdown = document.getElementById("countdown");
@@ -12,7 +12,8 @@ counter$
     map(() => -1),
     scan((accumulator, current) => {
       return accumulator + current;
-    }, 10),
+    }, 5),
+    tap((value) => console.log(value)),
     filter((value) => value >= 0)
   )
   .subscribe((value) => {
