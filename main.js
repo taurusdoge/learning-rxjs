@@ -1,38 +1,42 @@
+import { from } from "rxjs";
 import {
-  interval,
-  map,
+  reduce,
   scan,
-  filter,
-  tap,
-  takeWhile,
-  fromEvent,
-  takeUntil,
-} from "rxjs";
+  map,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+} from "rxjs/operators";
 
-// elem refs
-const countdown = document.getElementById("countdown");
-const message = document.getElementById("message");
-const abortButton = document.getElementById("abort");
+const user = [
+  {
+    name: "Brian",
+    loggedIn: false,
+    token: null,
+  },
+  {
+    name: "Brian",
+    loggedIn: true,
+    token: "abc",
+  },
+  {
+    name: "Brian",
+    loggedIn: true,
+    token: "123",
+  },
+];
 
-// streams
-const counter$ = interval(1000);
-const abortClick$ = fromEvent(abortButton, "click");
+const state$ = from(user).pipe(
+  scan((accumulator, currentValue) => {
+    return { ...accumulator, ...currentValue };
+  }, {})
+);
 
-counter$
+state$
   .pipe(
-    map(() => -1),
-    scan((accumulator, current) => {
-      return accumulator + current;
-    }, 5),
-    tap(console.log),
-    // filter((value) => value >= 0)
-    takeWhile((value) => value >= 0),
-    takeUntil(abortClick$)
+    // distinctUntilChanged((prev, curr) => {
+    //   return prev.name === curr.name;
+    // }),
+    distinctUntilKeyChanged("name"),
+    map((state) => state.name)
   )
-  .subscribe((value) => {
-    countdown.innerHTML = value;
-
-    if (!value) {
-      message.innerHTML = "Liftoff!";
-    }
-  });
+  .subscribe({ next: console.log, complete: () => console.log("Complete!") });

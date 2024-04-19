@@ -1,5 +1,11 @@
 import { from } from "rxjs";
-import { reduce, scan, map } from "rxjs/operators";
+import {
+  reduce,
+  scan,
+  map,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+} from "rxjs/operators";
 
 const user = [
   {
@@ -8,12 +14,12 @@ const user = [
     token: null,
   },
   {
-    name: "Sam",
+    name: "Brian",
     loggedIn: true,
     token: "abc",
   },
   {
-    name: "John",
+    name: "Brian",
     loggedIn: true,
     token: "123",
   },
@@ -25,6 +31,12 @@ const state$ = from(user).pipe(
   }, {})
 );
 
-const name$ = state$
-  .pipe(map((state) => state.name))
+state$
+  .pipe(
+    // distinctUntilChanged((prev, curr) => {
+    //   return prev.name === curr.name;
+    // }),
+    distinctUntilKeyChanged("name"),
+    map((state) => state.name)
+  )
   .subscribe({ next: console.log, complete: () => console.log("Complete!") });
