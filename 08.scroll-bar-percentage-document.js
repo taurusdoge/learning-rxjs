@@ -1,5 +1,5 @@
-import { fromEvent } from "rxjs";
-import { map } from "rxjs/operators";
+import { fromEvent, asyncScheduler } from "rxjs";
+import { map, tap, throttleTime } from "rxjs/operators";
 
 // helpers
 function calculateScrollPercent(element) {
@@ -14,8 +14,12 @@ const progressBar = document.querySelector(".progress-bar");
 // streams
 const scroll$ = fromEvent(document, "scroll");
 const progress$ = scroll$.pipe(
-  // percent progress
-  map(({ target }) => calculateScrollPercent(target.documentElement))
+  throttleTime(30, asyncScheduler, {
+    leading: false,
+    trailing: true,
+  }),
+  map(({ target }) => calculateScrollPercent(target.documentElement)), // percent progress
+  tap(console.log)
 );
 
 progress$.subscribe((percent) => {
